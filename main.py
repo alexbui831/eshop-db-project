@@ -1,4 +1,4 @@
-#test for github
+#test for project
 import mysql.connector
 
 connection = mysql.connector.connect(host="localhost",user="root",password="mysql",database="shoppingcart")
