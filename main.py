@@ -1,5 +1,26 @@
+import mysql.connector
+import sys
+
+
 def main():
     print("Welcome to the EE ER Eshop Store!")
+    
+    ## attempts to connect to the database
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="eshop_project"
+        )
+        print("Successful connection.")
+    except:
+        print("Failed connection.")
+        ## exits the program if unsuccessful
+        sys.exit()
+    ## cursor to send queries through
+    cursor = connection.cursor()
+
 
     # loop menu options until exit option is chosen
     while(True):
@@ -172,7 +193,30 @@ def main():
             address = input("Shipping Address: ")
             cc_number = input("Credit Card Number: ")
 
-            print("\nThank you for registering with EE ER Eshop Store!")
+
+            # credit card has to be equal to 16 digits
+            while(len(cc_number) != 16):
+                print("\nYour credit card must be exactly 16 digits. Please try again.")
+                cc_number = input("Credit Card Number: ")
+
+            
+            try:
+
+                # insertion query
+                query = "INSERT INTO user (userName, password, firstName, lastName, email, address, cc_info) VALUES (%s, %s,%s, %s, %s, %s, %s)"
+                data = (username, password, fname, lname, email, address, cc_number)
+
+                # sends query and data
+                cursor.execute(query, data)
+                
+                # commits to database
+                connection.commit()
+
+                print("\nThank you for registering with EE ER Eshop Store!")
+
+            # if (username == existing username) no register allowed
+            except:
+                print("\nUsername is already taken! BEEP BOOP! Please try registering again homie!")
 
         else:
             print("Option not valid. Please try again.")
