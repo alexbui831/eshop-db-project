@@ -58,6 +58,7 @@ def main():
                 if(password == password1):
                     logged_in = True
 
+                    # grabs all of the user's information
                     for x in result:
                         username = x[0]
                         fname = x[2]
@@ -66,6 +67,7 @@ def main():
                         address = x[5]
                         cc = x[6]
 
+                    # creates a user class to be used in program
                     user = User(username, fname, lname, email, address, cc)
 
                     print("\nLogged in successfully")
@@ -165,8 +167,16 @@ def main():
                             break
 
                         elif(answer == "1"):
-                            # print account info
+
                             while(True):
+                                # print account info
+                                print("\nUsername " + user.getUsername())
+                                print("First name: " + user.getFname())
+                                print("Last name: " + user.getLname())
+                                print("Email: " + user.getEmail())
+                                print("Address: " + user.getAddress())
+                                print("Credit Card Number: " + user.getCC())
+
                                 print("\n0. Go back")
                                 print("1. Edit Shipping Address")
                                 print("2. Edit Payment Information\n")
@@ -175,6 +185,41 @@ def main():
 
                                 if(answer == "0"):
                                     break
+
+                                elif(answer == "1"):
+                                    address = input("What would you like to change your shipping address to? ")
+                                    
+                                    # update query
+                                    query = "UPDATE user SET address = " + "\"" + address + "\" " + "WHERE username = " + "\"" + user.getUsername() + "\""
+
+                                    # sends query and data
+                                    cursor.execute(query)
+                                            
+                                    # commits to database
+                                    connection.commit()
+
+                                    # update logged in user's address
+                                    user.setAddress(address)
+
+                                elif(answer == "2"):
+                                    cc = input("What would you like to change your credit card number to? ")
+
+                                    # credit card has to be equal to 16 digits
+                                    while(len(cc) != 16):
+                                        print("\nYour credit card must be exactly 16 digits. Please try again.")
+                                        cc = input("Credit Card Number: ")
+                                    
+                                    # update query
+                                    query = "UPDATE user SET cc_info = " + "\"" + cc + "\" " + "WHERE username = " + "\"" + user.getUsername() + "\""
+
+                                    # sends query and data
+                                    cursor.execute(query)
+                                            
+                                    # commits to database
+                                    connection.commit()
+
+                                    #update logged in user's address
+                                    user.setCC(cc)
 
                                 else:
                                     print("Option not valid. Please try again.")
@@ -227,10 +272,8 @@ def main():
             while(len(cc_number) != 16):
                 print("\nYour credit card must be exactly 16 digits. Please try again.")
                 cc_number = input("Credit Card Number: ")
-
             
             try:
-
                 # insertion query
                 query = "INSERT INTO user (userName, password, firstName, lastName, email, address, cc_info) VALUES (%s, %s,%s, %s, %s, %s, %s)"
                 data = (username, password, fname, lname, email, address, cc_number)
