@@ -1,6 +1,6 @@
 import mysql.connector
 import sys
-
+from module import User
 
 def main():
     print("Welcome to the EE ER Eshop Store!")
@@ -21,7 +21,6 @@ def main():
     ## cursor to send queries through
     cursor = connection.cursor()
 
-
     # loop menu options until exit option is chosen
     while(True):
         
@@ -37,15 +36,47 @@ def main():
         if(answer == "0"):
             break
 
-        
+        # login condition
         elif(answer == "1"):
+            logged_in = False
+            # ask for username and password
             username = input("Username: ")
             password = input("Password: ")
 
-            # todo username & password check with database here
-            logged_in = True
+            # query to get password with corresponding username
+            query = "SELECT * FROM user WHERE username = " + "\"" + username + "\""
 
-            print("\nLogged in successfully")
+            cursor.execute(query)
+
+            result = cursor.fetchall()
+
+            # if there is a result check if passwords match
+            if(len(result) != 0):
+                for x in result:
+                    password1 = x[1]
+
+                if(password == password1):
+                    logged_in = True
+
+                    # grabs all of the user's information
+                    for x in result:
+                        username = x[0]
+                        fname = x[2]
+                        lname = x[3]
+                        email = x[4]
+                        address = x[5]
+                        cc = x[6]
+
+                    # creates a user class to be used in program
+                    user = User(username, fname, lname, email, address, cc)
+
+                    print("\nLogged in successfully")
+
+                else:
+                    print("\nUsername or password incorrect. Please try logging in again.")
+
+            else:
+                print("\nUsername or password incorrect. Please try logging in again.")
 
             while(logged_in):
                 print("\n0. Logout")
@@ -136,8 +167,16 @@ def main():
                             break
 
                         elif(answer == "1"):
-                            # print account info
+
                             while(True):
+                                # print account info
+                                print("\nUsername " + user.getUsername())
+                                print("First name: " + user.getFname())
+                                print("Last name: " + user.getLname())
+                                print("Email: " + user.getEmail())
+                                print("Address: " + user.getAddress())
+                                print("Credit Card Number: " + user.getCC())
+
                                 print("\n0. Go back")
                                 print("1. Edit Shipping Address")
                                 print("2. Edit Payment Information\n")
@@ -146,6 +185,41 @@ def main():
 
                                 if(answer == "0"):
                                     break
+
+                                elif(answer == "1"):
+                                    address = input("What would you like to change your shipping address to? ")
+                                    
+                                    # update query
+                                    query = "UPDATE user SET address = " + "\"" + address + "\" " + "WHERE username = " + "\"" + user.getUsername() + "\""
+
+                                    # sends query and data
+                                    cursor.execute(query)
+                                            
+                                    # commits to database
+                                    connection.commit()
+
+                                    # update logged in user's address
+                                    user.setAddress(address)
+
+                                elif(answer == "2"):
+                                    cc = input("What would you like to change your credit card number to? ")
+
+                                    # credit card has to be equal to 16 digits
+                                    while(len(cc) != 16):
+                                        print("\nYour credit card must be exactly 16 digits. Please try again.")
+                                        cc = input("Credit Card Number: ")
+                                    
+                                    # update query
+                                    query = "UPDATE user SET cc_info = " + "\"" + cc + "\" " + "WHERE username = " + "\"" + user.getUsername() + "\""
+
+                                    # sends query and data
+                                    cursor.execute(query)
+                                            
+                                    # commits to database
+                                    connection.commit()
+
+                                    #update logged in user's address
+                                    user.setCC(cc)
 
                                 else:
                                     print("Option not valid. Please try again.")
@@ -198,10 +272,8 @@ def main():
             while(len(cc_number) != 16):
                 print("\nYour credit card must be exactly 16 digits. Please try again.")
                 cc_number = input("Credit Card Number: ")
-
             
             try:
-
                 # insertion query
                 query = "INSERT INTO user (userName, password, firstName, lastName, email, address, cc_info) VALUES (%s, %s,%s, %s, %s, %s, %s)"
                 data = (username, password, fname, lname, email, address, cc_number)
