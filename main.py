@@ -1,6 +1,6 @@
 import mysql.connector
 import sys
-
+from module import User
 
 def main():
     print("Welcome to the EE ER Eshop Store!")
@@ -21,7 +21,6 @@ def main():
     ## cursor to send queries through
     cursor = connection.cursor()
 
-
     # loop menu options until exit option is chosen
     while(True):
         
@@ -37,15 +36,45 @@ def main():
         if(answer == "0"):
             break
 
-        
+        # login condition
         elif(answer == "1"):
+            logged_in = False
+            # ask for username and password
             username = input("Username: ")
             password = input("Password: ")
 
-            # todo username & password check with database here
-            logged_in = True
+            # query to get password with corresponding username
+            query = "SELECT * FROM user WHERE username = " + "\"" + username + "\""
 
-            print("\nLogged in successfully")
+            cursor.execute(query)
+
+            result = cursor.fetchall()
+
+            # if there is a result check if passwords match
+            if(len(result) != 0):
+                for x in result:
+                    password1 = x[1]
+
+                if(password == password1):
+                    logged_in = True
+
+                    for x in result:
+                        username = x[0]
+                        fname = x[2]
+                        lname = x[3]
+                        email = x[4]
+                        address = x[5]
+                        cc = x[6]
+
+                    user = User(username, fname, lname, email, address, cc)
+
+                    print("\nLogged in successfully")
+
+                else:
+                    print("\nUsername or password incorrect. Please try logging in again.")
+
+            else:
+                print("\nUsername or password incorrect. Please try logging in again.")
 
             while(logged_in):
                 print("\n0. Logout")
