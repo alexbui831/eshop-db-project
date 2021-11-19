@@ -1,10 +1,10 @@
 import mysql.connector
 import sys
-from module import User
+from module import *
 
 def main():
     print("Welcome to the EE ER Eshop Store!")
-    
+
     ## attempts to connect to the database
     try:
         connection = mysql.connector.connect(
@@ -18,6 +18,7 @@ def main():
         print("Failed connection.")
         ## exits the program if unsuccessful
         sys.exit()
+        
     ## cursor to send queries through
     cursor = connection.cursor()
 
@@ -95,6 +96,7 @@ def main():
                     print("\nWelcome to the books page!")
 
                     while(True):
+                
                         print("\n0. Go back")
                         print("1. View Books\n")
 
@@ -105,6 +107,19 @@ def main():
 
                         elif(answer == "1"):
                             # print all the books
+
+                            # query to select books from database
+                            query = "SELECT * FROM item"
+                            cursor.execute(query)
+
+                            # fetches data
+                            result = cursor.fetchall()
+
+                            # loops through query
+                            for x in result:
+                                convertedInt = str(x[2])
+                                print("| Book ID:", x[0], "| Title:", x[1], "| Price: $" + convertedInt, "| Quantity:", x[3],"|")
+
                             while(True):
                                 print("\n0. Go back")
                                 print("1. Add book to cart\n")
