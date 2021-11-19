@@ -51,4 +51,7 @@ class Book:
 
     def getInventory(self):
         return self.inventory
+
+    def decrementInventory(self):
+        self.inventory - 1
     
