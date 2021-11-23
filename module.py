@@ -32,7 +32,7 @@ class User:
     def setCC(self, cc):
         self.cc = cc
 
-class Book:
+class Item:
     #   constructor
     def __init__(self, productNum, productName, price, inventory):
         self.productNum = productNum
@@ -41,7 +41,7 @@ class Book:
         self.inventory = inventory
 
     def getProductNum(self):
-        return self.getProductNum
+        return self.productNum
     
     def getProductName(self):
         return self.productName
