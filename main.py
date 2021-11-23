@@ -180,7 +180,7 @@ def main():
                     while(True):
                         print("\n0. Go back")
                         print("1. View Cart\n")
-
+                    
                         answer = input("What would you like to do? ")
 
                         if(answer == "0"): 
@@ -207,6 +207,49 @@ def main():
 
                                 if(answer == "0"):
                                     break
+
+                                elif(answer == "1"):
+                                    #   print book id title price
+                                    for x in result:
+                                        print("| Book ID:", x[0], "| Title:", x[1], "| Price: $" + str(x[2]), "|")
+
+                                    answer = input("\nWhat book would you like to remove? ")
+
+                                    try:
+                                        # delete 1 book from cart
+                                        query = "DELETE FROM cart WHERE username = " + "\"" + user.getUsername() + "\" AND productNum = " + "\"" + answer + "\" LIMIT 1"
+                                        cursor.execute(query)
+
+                                        # commit query
+                                        connection.commit()
+
+                                    except:
+                                        # handles when user answer cart not remove
+                                        print("Item is not in your cart. Please try again.")
+
+                                elif(answer == "2"):
+                                    query = "SELECT productNum FROM cart WHERE username = " + "\"" + user.getUsername() + "\""
+                                    
+                                    cursor.execute(query)
+
+                                    # fetches data
+                                    result = cursor.fetchall()
+
+                                    for x in result:
+                                        query1 = "INSERT INTO history(productNum, userName) VALUES (%s, %s)"
+                                        data = (x[0], user.getUsername())
+
+                                        # sends query and data
+                                        cursor.execute(query1, data)
+                
+                                         # commits to database
+                                        connection.commit()
+
+                                    query = "DELETE FROM cart WHERE username = "+ "\"" + user.getUsername() + "\""
+                                    cursor.execute(query)
+                                    connection.commit()
+
+                                    print("Order completed.")
 
                                 else:
                                     print("Option not valid. Please try again.")
@@ -288,7 +331,17 @@ def main():
                                     print("Option not valid. Please try again.")
 
                         elif(answer == "2"):
-                            # print history
+                            # view history
+                            query = "SELECT i.productName, i.price, h.date FROM history as h, item as i WHERE username = " + "\"" + user.getUsername() + "\" " + "AND h.productNum = i.productNum"
+                            cursor.execute(query)
+
+                            # fetches data
+                            result = cursor.fetchall()
+
+                            # loops through query
+                            for x in result:
+                               print("| Title:", x[0], "| Price: $" + str(x[1]), "| Date:", x[2], "|")
+
                             while(True):
                                 print("\n0. Go back\n")
 
@@ -299,6 +352,8 @@ def main():
 
                                 else:
                                     print("Option not valid. Please try again.")
+                            
+
 
                         else:
                             print("Option not valid. Please try again.")
@@ -357,3 +412,85 @@ def main():
             print("Option not valid. Please try again.")
 
 main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#leon lame
