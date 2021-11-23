@@ -71,6 +71,19 @@ def main():
                     # creates a user class to be used in program
                     user = User(username, fname, lname, email, address, cc)
 
+                    # query to select books from database
+                    query = "SELECT * FROM item"
+                    cursor.execute(query)
+
+                    # fetches data
+                    result = cursor.fetchall()
+
+                    books = []
+                    # loops through query
+                    for x in result:
+                        book = Item(x[0], x[1], x[2], x[3])
+                        books.append(book)
+
                     print("\nLogged in successfully")
 
                 else:
@@ -108,17 +121,10 @@ def main():
                         elif(answer == "1"):
                             # print all the books
 
-                            # query to select books from database
-                            query = "SELECT * FROM item"
-                            cursor.execute(query)
-
-                            # fetches data
-                            result = cursor.fetchall()
-
-                            # loops through query
-                            for x in result:
-                                convertedInt = str(x[2])
-                                print("| Book ID:", x[0], "| Title:", x[1], "| Price: $" + convertedInt, "| Quantity:", x[3],"|")
+                            for i in range(len(books)):
+                                # fix out of stock
+                                if(books[i].getInventory() != 0):
+                                    print("| Book ID:", books[i].getProductNum(), "| Title:", books[i].getProductName(), "| Price: $" + str(books[i].getPrice()), "| Quantity:", books[i].getInventory(),"|")
 
                             while(True):
                                 print("\n0. Go back")
@@ -128,6 +134,38 @@ def main():
 
                                 if(answer == "0"):
                                     break
+
+                                elif(answer == "1"):
+                                    print()
+                                    for i in range(len(books)):
+                                        if(books[i].getInventory() != 0):
+                                            print("| Book ID:", books[i].getProductNum(), "| Title:", books[i].getProductName(), "| Price: $" + str(books[i].getPrice()), "| Quantity:", books[i].getInventory(),"|")
+                                    
+                                    answer = input("\nWhich book would you like to add to your cart? ")
+
+                                    try:
+                                        # insertion query
+                                        query = "INSERT INTO cart (productNum, userName) VALUES (%s, %s)"
+                                        data = (answer, user.getUsername())
+
+                                        # sends query and data
+                                        cursor.execute(query, data)
+                
+                                         # commits to database
+                                        connection.commit()
+
+                                        for i in range(len(books)):
+                                            if(int(answer) == books[i].getProductNum()):
+                                                books[i].decrementInventory()
+
+                                        query = "UPDATE item SET inventory=inventory-1 WHERE productNum = " + "\"" + answer + "\""
+
+                                        cursor.execute(query)
+
+                                        connection.commit()
+
+                                    except:
+                                        print("That is not a valid book ID. Please try again.")
 
                                 else:
                                     print("Option not valid. Please try again.")
@@ -150,6 +188,16 @@ def main():
 
                         elif(answer == "1"):
                             # print cart items
+                            query = "SELECT c.productNum, i.productName, i.price FROM cart as c, item as i WHERE username = " + "\"" + user.getUsername() + "\" " + "AND c.productNum = i.productNum"
+                            cursor.execute(query)
+
+                            # fetches data
+                            result = cursor.fetchall()
+
+                            # loops through query
+                            for x in result:
+                               print("| Book ID:", x[0], "| Title:", x[1], "| Price: $" + str(x[2]), "|")
+
                             while(True):
                                 print("\n0. Go back")
                                 print("1. Remove item from cart")
