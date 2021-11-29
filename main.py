@@ -86,6 +86,20 @@ def main():
 
                     print("\nLogged in successfully")
 
+                    cart = Cart()
+
+                    # query for cart items
+                    query = "SELECT c.productNum, i.productName, i.price FROM cart as c, item as i WHERE username = " + "\"" + user.getUsername() + "\" " + "AND c.productNum = i.productNum"
+                    cursor.execute(query)
+
+                    # fetches data
+                    result = cursor.fetchall()
+
+                    # loops through query
+                    for x in result:
+                        book = Item(x[0], x[1], x[2], 0)
+                        cart.addItem(book)
+
                 else:
                     print("\nUsername or password incorrect. Please try logging in again.")
 
@@ -157,6 +171,7 @@ def main():
                                         for i in range(len(books)):
                                             if(int(answer) == books[i].getProductNum()):
                                                 books[i].decrementInventory()
+                                                cart.addItem(books[i])
 
                                         query = "UPDATE item SET inventory=inventory-1 WHERE productNum = " + "\"" + answer + "\""
 
@@ -187,16 +202,8 @@ def main():
                             break
 
                         elif(answer == "1"):
-                            # print cart items
-                            query = "SELECT c.productNum, i.productName, i.price FROM cart as c, item as i WHERE username = " + "\"" + user.getUsername() + "\" " + "AND c.productNum = i.productNum"
-                            cursor.execute(query)
 
-                            # fetches data
-                            result = cursor.fetchall()
-
-                            # loops through query
-                            for x in result:
-                               print("| Book ID:", x[0], "| Title:", x[1], "| Price: $" + str(x[2]), "|")
+                            cart.printCart()
 
                             while(True):
                                 print("\n0. Go back")
@@ -210,8 +217,7 @@ def main():
 
                                 elif(answer == "1"):
                                     #   print book id title price
-                                    for x in result:
-                                        print("| Book ID:", x[0], "| Title:", x[1], "| Price: $" + str(x[2]), "|")
+                                    cart.printCart()
 
                                     answer = input("\nWhat book would you like to remove? ")
 
@@ -222,6 +228,8 @@ def main():
 
                                         # commit query
                                         connection.commit()
+
+                                        cart.removeItem(int(answer))
 
                                     except:
                                         # handles when user answer cart not remove
@@ -248,6 +256,8 @@ def main():
                                     query = "DELETE FROM cart WHERE username = "+ "\"" + user.getUsername() + "\""
                                     cursor.execute(query)
                                     connection.commit()
+
+                                    cart.checkout()
 
                                     print("Order completed.")
 
@@ -353,7 +363,21 @@ def main():
                                 else:
                                     print("Option not valid. Please try again.")
                             
+                        elif(answer == "3"):
+                            # delete query
+                            query = "DELETE FROM user WHERE username = " + "\"" + user.getUsername() + "\""
 
+                            # sends query and data
+                            cursor.execute(query)
+                                    
+                            # commits to database
+                            connection.commit()
+
+                            logged_in = False
+
+                            print("Your account has been deleted.")
+                            
+                            break
 
                         else:
                             print("Option not valid. Please try again.")
