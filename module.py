@@ -77,3 +77,13 @@ class Cart:
         for x in range(len(self.items)):
             print("| Book ID:", self.items[x].getProductNum(), "| Title:", self.items[x].getProductName(), "| Price: $" + str(self.items[x].getPrice()), "|")
 
+class History:
+
+    def __init__(self, item, date):
+        self.item = item
+        self.date = date
+
+    def printHistory(self):
+        print("| Title:", self.item.getProductName(), "| Price: $" + str(self.item.getPrice()), "| Date:", self.date, "|")
+
+
