@@ -341,6 +341,8 @@ def main():
                                     print("Option not valid. Please try again.")
 
                         elif(answer == "2"):
+                            history = []
+
                             # view history
                             query = "SELECT i.productName, i.price, h.date FROM history as h, item as i WHERE username = " + "\"" + user.getUsername() + "\" " + "AND h.productNum = i.productNum"
                             cursor.execute(query)
@@ -350,7 +352,12 @@ def main():
 
                             # loops through query
                             for x in result:
-                               print("| Title:", x[0], "| Price: $" + str(x[1]), "| Date:", x[2], "|")
+                                book = Item(0, x[0], x[1], 0)
+                                history1 = History(book, x[2])
+                                history.append(history1)
+
+                            for x in range(len(history)):
+                                history[x].printHistory()
 
                             while(True):
                                 print("\n0. Go back\n")
