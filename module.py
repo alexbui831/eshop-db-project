@@ -55,3 +55,25 @@ class Item:
     def decrementInventory(self):
         self.inventory = self.inventory - 1
     
+class Cart:
+
+    def __init__(self):
+        self.items = []
+
+    def addItem(self, item):
+        self.items.append(item)
+
+    def removeItem(self, id):
+        for x in range(len(self.items)):
+            if(self.items[x].getProductNum() == id):
+                del self.items[x]
+                break
+    
+    def checkout(self):
+        for x in range(len(self.items)):
+            del self.items[x]
+
+    def printCart(self):
+        for x in range(len(self.items)):
+            print("| Book ID:", self.items[x].getProductNum(), "| Title:", self.items[x].getProductName(), "| Price: $" + str(self.items[x].getPrice()), "|")
+
